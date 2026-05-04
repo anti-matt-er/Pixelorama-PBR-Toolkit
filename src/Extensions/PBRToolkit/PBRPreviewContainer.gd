@@ -6,6 +6,7 @@ const ROTATION_SPEED := 0.005
 @onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
 @onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
 @onready var albedo_option_button: OptionButton = %AlbedoOptionButton
+@onready var camera: Camera3D = %Camera
 @onready var metallic_option_button: OptionButton = %MetallicOptionButton
 @onready var roughness_option_button: OptionButton = %RoughnessOptionButton
 @onready var normal_option_button: OptionButton = %NormalOptionButton
@@ -13,6 +14,10 @@ const ROTATION_SPEED := 0.005
 var layers: Array[BaseLayer] = []
 var rotating_preview := false
 var rotating_preview_start_position := Vector2.ZERO
+var accumulated_preview_rotation := Vector2.ZERO
+var dragging_preview := false
+var dragging_preview_start_position := Vector2.ZERO
+var accumulated_preview_drag := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -33,15 +38,6 @@ func _ready() -> void:
 
 func _on_project_data_changed(_project: Project) -> void:
 	_update_all_textures()
-
-
-func start_rotating_preview() -> void:
-	rotating_preview = true
-	rotating_preview_start_position = get_global_mouse_position()
-
-
-func stop_rotating_preview() -> void:
-	rotating_preview = false
 
 
 func get_layer_image(layer: BaseLayer) -> Image:
@@ -167,15 +163,28 @@ func _update_all_textures() -> void:
 
 
 func _preview_viewport_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-		start_rotating_preview()
+	if event.is_action_pressed("left_mouse"):
+		rotating_preview = true
+		rotating_preview_start_position = get_global_mouse_position()
+	if event.is_action_pressed("pan"):
+		dragging_preview = true
+		dragging_preview_start_position = get_global_mouse_position()
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_released():
-		stop_rotating_preview()
+	if event.is_action_released("left_mouse"):
+		rotating_preview = false
+		accumulated_preview_rotation += get_global_mouse_position() - rotating_preview_start_position
+	
+	if event.is_action_released("pan"):
+		dragging_preview = false
+		accumulated_preview_drag += get_global_mouse_position() - dragging_preview_start_position
 	
 	if rotating_preview:
-		var delta_mouse := get_global_mouse_position() - rotating_preview_start_position
+		var delta_mouse := get_global_mouse_position() - rotating_preview_start_position + accumulated_preview_rotation
 		pbr_preview_cube.rotation.y = delta_mouse.x * ROTATION_SPEED
 		pbr_preview_cube.rotation.x = delta_mouse.y * ROTATION_SPEED
+	
+	if dragging_preview:
+		var delta_mouse := get_global_mouse_position() - dragging_preview_start_position + accumulated_preview_drag
+		pbr_preview_cube.position = camera.project_position(delta_mouse + preview_viewport.size * 0.5, camera.position.z)
