@@ -8,8 +8,10 @@ const MAX_ZOOM_Z := 10.0
 
 @onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
 @onready var preview_zoom_slider: VSlider = %PreviewZoomSlider
+@onready var preview_reset_button: BaseButton = %PreviewResetButton
 @onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
 @onready var camera: Camera3D = %Camera
+@onready var initial_camera_pos := camera.position
 @onready var albedo_option_button: OptionButton = %AlbedoOptionButton
 @onready var metallic_option_button: OptionButton = %MetallicOptionButton
 @onready var roughness_option_button: OptionButton = %RoughnessOptionButton
@@ -32,6 +34,7 @@ func _ready() -> void:
 	
 	preview_viewport.gui_input.connect(_preview_viewport_gui_input)
 	preview_zoom_slider.value_changed.connect(zoom_camera_from_slider)
+	preview_reset_button.pressed.connect(reset_camera)
 	update_zoom_slider()
 	
 	albedo_option_button.item_selected.connect(_update_albedo)
@@ -180,6 +183,15 @@ func zoom_camera(dir: float) -> void:
 
 func zoom_camera_from_slider(slider_value: float) -> void:
 	camera.position.z = remap(slider_value, preview_zoom_slider.max_value, preview_zoom_slider.min_value, MIN_ZOOM_Z, MAX_ZOOM_Z)
+
+
+func reset_camera() -> void:
+	camera.position = initial_camera_pos
+	pbr_preview_cube.position = Vector3.ZERO
+	pbr_preview_cube.rotation = Vector3.ZERO
+	accumulated_preview_drag = Vector2.ZERO
+	accumulated_preview_rotation = Vector2.ZERO
+	update_zoom_slider()
 
 
 func _preview_viewport_gui_input(event: InputEvent) -> void:

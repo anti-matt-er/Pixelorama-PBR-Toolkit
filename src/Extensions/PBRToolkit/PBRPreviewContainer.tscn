@@ -1,10 +1,11 @@
-[gd_scene format=3 uid="uid://b22gne280pn7q"]
+[gd_scene format=3 uid="uid://b8p0tshq3dilu"]
 
-[ext_resource type="Script" path="res://src/Extensions/PBRToolkit/PBRPreviewContainer.gd" id="1_3lcye"]
+[ext_resource type="Script" uid="uid://cxmi3px2lanw3" path="res://src/Extensions/PBRToolkit/PBRPreviewContainer.gd" id="1_3lcye"]
 [ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/TransparentChecker.tscn" id="2_ei0xn"]
 [ext_resource type="Shader" uid="uid://bggsv8qqty6kw" path="res://src/Extensions/PBRToolkit/TransparentChecker.gdshader" id="3_s7gaa"]
 [ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
 [ext_resource type="Script" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.gd" id="4_3lcye"]
+[ext_resource type="Texture2D" uid="uid://bv7ldl8obhawm" path="res://assets/icon_reload.png" id="6_aa0gb"]
 
 [sub_resource type="ShaderMaterial" id="1"]
 shader = ExtResource("3_s7gaa")
@@ -31,15 +32,15 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBox/HBox" unique_id=1082567405]
+[node name="ZoomContainer" type="VBoxContainer" parent="VBox/HBox" unique_id=1082567405]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/HBox/VBoxContainer" unique_id=2123199402]
+[node name="Label" type="Label" parent="VBox/HBox/ZoomContainer" unique_id=2123199402]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "+"
 
-[node name="PreviewZoomSlider" type="VSlider" parent="VBox/HBox/VBoxContainer" unique_id=1185696676]
+[node name="PreviewZoomSlider" type="VSlider" parent="VBox/HBox/ZoomContainer" unique_id=1185696676]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -48,7 +49,7 @@ mouse_default_cursor_shape = 2
 step = 0.01
 value = 1.0
 
-[node name="Label2" type="Label" parent="VBox/HBox/VBoxContainer" unique_id=745124252]
+[node name="Label2" type="Label" parent="VBox/HBox/ZoomContainer" unique_id=745124252]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "-"
@@ -65,7 +66,7 @@ stretch = true
 transparent_bg = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 0
-size = Vector2i(308, 100)
+size = Vector2i(288, 100)
 render_target_update_mode = 4
 
 [node name="TransparentChecker" parent="VBox/HBox/PreviewViewportContainer/SubViewport" unique_id=834267784 instance=ExtResource("2_ei0xn")]
@@ -86,6 +87,15 @@ current = true
 fov = 30.0
 near = 0.001
 far = 20.0
+
+[node name="ButtonsContainer" type="VBoxContainer" parent="VBox/HBox" unique_id=2080322278]
+layout_mode = 2
+
+[node name="PreviewResetButton" type="TextureButton" parent="VBox/HBox/ButtonsContainer" unique_id=793417868]
+unique_name_in_owner = true
+layout_mode = 2
+accessibility_name = "Reset camera"
+texture_normal = ExtResource("6_aa0gb")
 
 [node name="CelSelectionContainer" type="VBoxContainer" parent="VBox" unique_id=414428403]
 layout_mode = 2
