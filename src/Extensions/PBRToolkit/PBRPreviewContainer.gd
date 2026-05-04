@@ -15,6 +15,7 @@ const MAX_ZOOM_Z := 10.0
 @onready var albedo_option_button: OptionButton = %AlbedoOptionButton
 @onready var metallic_option_button: OptionButton = %MetallicOptionButton
 @onready var roughness_option_button: OptionButton = %RoughnessOptionButton
+@onready var emission_option_button: OptionButton = %EmissionOptionButton
 @onready var normal_option_button: OptionButton = %NormalOptionButton
 
 var layers: Array[BaseLayer] = []
@@ -98,6 +99,7 @@ func _update_layers() -> void:
 	var previous_albedo: BaseLayer
 	var previous_metallic: BaseLayer
 	var previous_roughness: BaseLayer
+	var previous_emission: BaseLayer
 	var previous_normal: BaseLayer
 	
 	if not layers.is_empty():
@@ -107,6 +109,8 @@ func _update_layers() -> void:
 			previous_metallic = layers[metallic_option_button.selected-1]
 		if roughness_option_button.selected > 0 and layers.size() >= roughness_option_button.selected:
 			previous_roughness = layers[roughness_option_button.selected-1]
+		if emission_option_button.selected > 0 and layers.size() >= emission_option_button.selected:
+			previous_emission = layers[emission_option_button.selected-1]
 		if normal_option_button.selected > 0 and layers.size() >= normal_option_button.selected:
 			previous_normal = layers[normal_option_button.selected-1]
 	
@@ -117,6 +121,7 @@ func _update_layers() -> void:
 		albedo_option_button,
 		metallic_option_button,
 		roughness_option_button,
+		emission_option_button,
 		normal_option_button
 	]:
 		option_button.clear()
@@ -132,6 +137,8 @@ func _update_layers() -> void:
 			metallic_option_button.select(layers.find(previous_metallic)+1)
 		if previous_roughness and layers.has(previous_roughness):
 			roughness_option_button.select(layers.find(previous_roughness)+1)
+		if previous_emission and layers.has(previous_emission):
+			emission_option_button.select(layers.find(previous_emission)+1)
 		if previous_normal and layers.has(previous_normal):
 			normal_option_button.select(layers.find(previous_normal)+1)
 
@@ -157,6 +164,13 @@ func _update_roughness(layer_number: int) -> void:
 		pbr_preview_cube.roughness.set_image(get_layer_image(layers[layer_number-1]))
 
 
+func _update_emission(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.emission.set_image(pbr_preview_cube.default_emission)
+	else:
+		pbr_preview_cube.emission.set_image(get_layer_image(layers[layer_number-1]))
+
+
 func _update_normal(layer_number: int) -> void:
 	if layer_number <= 0 || layers.size() < layer_number:
 		pbr_preview_cube.normal.set_image(pbr_preview_cube.default_normal)
@@ -168,6 +182,7 @@ func _update_all_textures() -> void:
 	_update_albedo(albedo_option_button.selected)
 	_update_metallic(metallic_option_button.selected)
 	_update_roughness(roughness_option_button.selected)
+	_update_emission(emission_option_button.selected)
 	_update_normal(normal_option_button.selected)
 
 

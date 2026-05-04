@@ -163,6 +163,20 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="Emission" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=1671843050]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Emission" unique_id=1116870543]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Emission:"
+
+[node name="EmissionOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Emission" unique_id=289556436]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=378153432]
 layout_mode = 2
 
