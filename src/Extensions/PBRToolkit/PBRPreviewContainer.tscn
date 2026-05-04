@@ -118,75 +118,79 @@ layout_mode = 2
 accessibility_name = "Reset camera"
 texture_normal = ExtResource("6_aa0gb")
 
-[node name="CelSelectionContainer" type="VBoxContainer" parent="VBox" unique_id=414428403]
+[node name="CelSelectionContainer" type="FoldableContainer" parent="VBox" unique_id=1858149766]
+layout_mode = 2
+title = "Textures"
+
+[node name="VBox" type="VBoxContainer" parent="VBox/CelSelectionContainer" unique_id=414428403]
 layout_mode = 2
 
-[node name="Albedo" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=236736350]
+[node name="Albedo" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=236736350]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Albedo" unique_id=1611807877]
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=1611807877]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 text = "Albedo:"
 
-[node name="AlbedoOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Albedo" unique_id=1167449700]
+[node name="AlbedoOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=1167449700]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Metallic" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=323814586]
+[node name="Metallic" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=323814586]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Metallic" unique_id=1695414549]
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=1695414549]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 text = "Metallic:"
 
-[node name="MetallicOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Metallic" unique_id=153537504]
+[node name="MetallicOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=153537504]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Roughness" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=783590676]
+[node name="Roughness" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=783590676]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Roughness" unique_id=384607783]
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=384607783]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 text = "Roughness:"
 
-[node name="RoughnessOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Roughness" unique_id=26601222]
+[node name="RoughnessOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=26601222]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Emission" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=1671843050]
+[node name="Emission" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=1671843050]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Emission" unique_id=1116870543]
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1116870543]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 text = "Emission:"
 
-[node name="EmissionOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Emission" unique_id=289556436]
+[node name="EmissionOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=289556436]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=378153432]
+[node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=378153432]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Normal" unique_id=1095048620]
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=1095048620]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 text = "Normal:"
 
-[node name="NormalOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Normal" unique_id=2014742227]
+[node name="NormalOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=2014742227]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
