@@ -36,3 +36,9 @@ func _ready() -> void:
 	material.metallic_texture = metallic
 	material.roughness_texture = roughness
 	material.normal_texture = normal
+	
+	albedo.changed.connect(check_alpha)
+
+
+func check_alpha() -> void:
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if albedo.has_alpha() else BaseMaterial3D.TRANSPARENCY_DISABLED
