@@ -2,11 +2,15 @@ extends PanelContainer
 
 
 const ROTATION_SPEED := 0.005
+const ZOOM_INCREMENT := 0.1
+const MIN_ZOOM_Z := 0.502 # +0.002 to account for camera near-clip of 0.001
+const MAX_ZOOM_Z := 10.0
 
 @onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
+@onready var preview_zoom_slider: VSlider = %PreviewZoomSlider
 @onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
-@onready var albedo_option_button: OptionButton = %AlbedoOptionButton
 @onready var camera: Camera3D = %Camera
+@onready var albedo_option_button: OptionButton = %AlbedoOptionButton
 @onready var metallic_option_button: OptionButton = %MetallicOptionButton
 @onready var roughness_option_button: OptionButton = %RoughnessOptionButton
 @onready var normal_option_button: OptionButton = %NormalOptionButton
@@ -27,6 +31,8 @@ func _ready() -> void:
 	Global.cel_switched.connect(_update_all_textures)
 	
 	preview_viewport.gui_input.connect(_preview_viewport_gui_input)
+	preview_zoom_slider.value_changed.connect(zoom_camera_from_slider)
+	update_zoom_slider()
 	
 	albedo_option_button.item_selected.connect(_update_albedo)
 	metallic_option_button.item_selected.connect(_update_metallic)
@@ -162,29 +168,44 @@ func _update_all_textures() -> void:
 	_update_normal(normal_option_button.selected)
 
 
+func update_zoom_slider() -> void:
+	preview_zoom_slider.value = remap(camera.position.z, MIN_ZOOM_Z, MAX_ZOOM_Z, preview_zoom_slider.max_value, preview_zoom_slider.min_value)
+
+
+func zoom_camera(dir: float) -> void:
+	camera.position.z += dir * ZOOM_INCREMENT
+	camera.position.z = clampf(camera.position.z, MIN_ZOOM_Z, MAX_ZOOM_Z)
+	update_zoom_slider()
+
+
+func zoom_camera_from_slider(slider_value: float) -> void:
+	camera.position.z = remap(slider_value, preview_zoom_slider.max_value, preview_zoom_slider.min_value, MIN_ZOOM_Z, MAX_ZOOM_Z)
+
+
 func _preview_viewport_gui_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left_mouse"):
 		rotating_preview = true
 		rotating_preview_start_position = get_global_mouse_position()
-	if event.is_action_pressed("pan"):
+	elif event.is_action_pressed("pan"):
 		dragging_preview = true
 		dragging_preview_start_position = get_global_mouse_position()
+	elif event.is_action_pressed(&"zoom_in", false, true):
+		zoom_camera(-1)
+	elif event.is_action_pressed(&"zoom_out", false, true):
+		zoom_camera(1)
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_released("left_mouse"):
 		rotating_preview = false
 		accumulated_preview_rotation += get_global_mouse_position() - rotating_preview_start_position
-	
 	if event.is_action_released("pan"):
 		dragging_preview = false
 		accumulated_preview_drag += get_global_mouse_position() - dragging_preview_start_position
-	
 	if rotating_preview:
 		var delta_mouse := get_global_mouse_position() - rotating_preview_start_position + accumulated_preview_rotation
 		pbr_preview_cube.rotation.y = delta_mouse.x * ROTATION_SPEED
 		pbr_preview_cube.rotation.x = delta_mouse.y * ROTATION_SPEED
-	
 	if dragging_preview:
 		var delta_mouse := get_global_mouse_position() - dragging_preview_start_position + accumulated_preview_drag
 		pbr_preview_cube.position = camera.project_position(delta_mouse + preview_viewport.size * 0.5, camera.position.z)

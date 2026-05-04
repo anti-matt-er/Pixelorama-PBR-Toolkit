@@ -40,12 +40,11 @@ size_flags_horizontal = 4
 text = "+"
 
 [node name="PreviewZoomSlider" type="VSlider" parent="VBox/HBox/VBoxContainer" unique_id=1185696676]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 3
 mouse_default_cursor_shape = 2
-min_value = 1.0
-max_value = 5.0
 step = 0.01
 value = 1.0
 
@@ -146,7 +145,3 @@ text = "Normal:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-
-[connection signal="value_changed" from="VBox/HBox/VBoxContainer/PreviewZoomSlider" to="." method="_on_PreviewZoomSlider_value_changed"]
-[connection signal="mouse_entered" from="VBox/HBox/PreviewViewportContainer" to="." method="_on_PreviewViewportContainer_mouse_entered"]
-[connection signal="mouse_exited" from="VBox/HBox/PreviewViewportContainer" to="." method="_on_PreviewViewportContainer_mouse_exited"]
