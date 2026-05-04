@@ -117,6 +117,10 @@ func _update_layers() -> void:
 	var project = Global.current_project
 	layers = project.layers.duplicate()
 	
+	for layer in layers:
+		if not layer.name_changed.is_connected(_update_layers):
+			layer.name_changed.connect(_update_layers)
+	
 	for option_button: OptionButton in [
 		albedo_option_button,
 		metallic_option_button,
