@@ -13,10 +13,20 @@ const MAX_ZOOM_Z := 10.0
 @onready var camera: Camera3D = %Camera
 @onready var initial_camera_pos := camera.position
 @onready var albedo_option_button: OptionButton = %AlbedoOptionButton
+@onready var albedo_layer_button: BaseButton = %AlbedoLayerButton
+@onready var albedo_group_button: BaseButton = %AlbedoGroupButton
 @onready var metallic_option_button: OptionButton = %MetallicOptionButton
+@onready var metallic_layer_button: BaseButton = %MetallicLayerButton
+@onready var metallic_group_button: BaseButton = %MetallicGroupButton
 @onready var roughness_option_button: OptionButton = %RoughnessOptionButton
+@onready var roughness_layer_button: BaseButton = %RoughnessLayerButton
+@onready var roughness_group_button: BaseButton = %RoughnessGroupButton
 @onready var emission_option_button: OptionButton = %EmissionOptionButton
+@onready var emission_layer_button: BaseButton = %EmissionLayerButton
+@onready var emission_group_button: BaseButton = %EmissionGroupButton
 @onready var normal_option_button: OptionButton = %NormalOptionButton
+@onready var normal_layer_button: BaseButton = %NormalLayerButton
+@onready var normal_group_button: BaseButton = %NormalGroupButton
 
 var layers: Array[BaseLayer] = []
 var rotating_preview := false
@@ -39,9 +49,20 @@ func _ready() -> void:
 	update_zoom_slider()
 	
 	albedo_option_button.item_selected.connect(_update_albedo)
+	albedo_layer_button.pressed.connect(create_and_assign_layer.bind(albedo_option_button, "Albedo", false))
+	albedo_group_button.pressed.connect(create_and_assign_layer.bind(albedo_option_button, "Albedo", true))
 	metallic_option_button.item_selected.connect(_update_metallic)
+	metallic_layer_button.pressed.connect(create_and_assign_layer.bind(metallic_option_button, "Metallic", false))
+	metallic_group_button.pressed.connect(create_and_assign_layer.bind(metallic_option_button, "Metallic", true))
 	roughness_option_button.item_selected.connect(_update_roughness)
+	roughness_layer_button.pressed.connect(create_and_assign_layer.bind(roughness_option_button, "Roughness", false))
+	roughness_group_button.pressed.connect(create_and_assign_layer.bind(roughness_option_button, "Roughness", true))
+	emission_option_button.item_selected.connect(_update_emission)
+	emission_layer_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", false))
+	emission_group_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", true))
 	normal_option_button.item_selected.connect(_update_normal)
+	normal_layer_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "normal", false))
+	normal_group_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "normal", true))
 	
 	_update_all_textures()
 
@@ -93,6 +114,25 @@ func get_layer_image(layer: BaseLayer) -> Image:
 		cel.update_texture()
 	
 	return layer_image
+
+
+func create_layer(layer_name: String, group: bool) -> BaseLayer:
+	var project := Global.current_project
+	var layer: BaseLayer
+	if group:
+		layer = GroupLayer.new(project, layer_name)
+	else:
+		layer = PixelLayer.new(project, layer_name)
+	Global.animation_timeline.add_layer(layer, project)
+	
+	return layer
+
+
+func create_and_assign_layer(option_button: OptionButton, layer_name: String, group: bool) -> void:
+	var layer = create_layer(layer_name, group)
+	var layer_index := layers.find(layer)
+	option_button.select(layer_index+1)
+	option_button.item_selected.emit(layer_index+1)
 
 
 func _update_layers() -> void:

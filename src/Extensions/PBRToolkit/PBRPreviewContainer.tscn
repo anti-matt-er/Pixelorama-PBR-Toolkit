@@ -5,6 +5,8 @@
 [ext_resource type="Shader" uid="uid://bggsv8qqty6kw" path="res://src/Extensions/PBRToolkit/TransparentChecker.gdshader" id="3_s7gaa"]
 [ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
 [ext_resource type="Texture2D" uid="uid://bv7ldl8obhawm" path="res://assets/icon_reload.png" id="6_aa0gb"]
+[ext_resource type="Texture2D" uid="uid://d36mlbmq06q4e" path="res://assets/layers/new.png" id="6_ncvrd"]
+[ext_resource type="Texture2D" uid="uid://cmgnc2emsbxni" path="res://assets/layers/group_new.png" id="7_vivy3"]
 
 [sub_resource type="ShaderMaterial" id="1"]
 shader = ExtResource("3_s7gaa")
@@ -14,7 +16,7 @@ shader_parameter/color1 = Color(0.7, 0.7, 0.7, 1)
 shader_parameter/color2 = Color(1, 1, 1, 1)
 shader_parameter/offset = Vector2(0, 0)
 shader_parameter/scale = Vector2(0, 0)
-shader_parameter/rect_size = Vector2(288, 100)
+shader_parameter/rect_size = Vector2(0, 100)
 shader_parameter/follow_movement = false
 shader_parameter/follow_scale = false
 
@@ -139,6 +141,16 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="AlbedoLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=190710019]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="AlbedoGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=254958081]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
+
 [node name="Metallic" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=323814586]
 layout_mode = 2
 
@@ -152,6 +164,16 @@ text = "Metallic:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="MetallicLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=183318450]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="MetallicGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=344177190]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
 
 [node name="Roughness" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=783590676]
 layout_mode = 2
@@ -167,6 +189,16 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="RoughnessLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=895917769]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="RoughnessGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=1716424203]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
+
 [node name="Emission" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=1671843050]
 layout_mode = 2
 
@@ -181,6 +213,16 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="EmissionLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1275545039]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="EmissionGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1176899399]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
+
 [node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=378153432]
 layout_mode = 2
 
@@ -194,3 +236,13 @@ text = "Normal:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="NormalLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=60707091]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="NormalGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=1230868211]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
