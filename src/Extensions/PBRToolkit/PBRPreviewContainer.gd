@@ -61,8 +61,8 @@ func _ready() -> void:
 	emission_layer_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", false))
 	emission_group_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", true))
 	normal_option_button.item_selected.connect(_update_normal)
-	normal_layer_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "normal", false))
-	normal_group_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "normal", true))
+	normal_layer_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", false))
+	normal_group_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", true))
 	
 	_update_all_textures()
 
