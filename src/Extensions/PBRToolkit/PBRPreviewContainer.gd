@@ -118,11 +118,28 @@ func get_layer_image(layer: BaseLayer) -> Image:
 
 func create_layer(layer_name: String, group: bool) -> BaseLayer:
 	var project := Global.current_project
+	
+	var unique_name := layer_name
+	var name_available := false
+	var suffix := 1
+	
+	while not name_available:
+		name_available = true
+		for layer in project.layers:
+			if layer.name == unique_name:
+				name_available = false
+				suffix += 1
+				unique_name = "{name} {suffix}".format({
+					"name": layer_name,
+					"suffix": suffix
+				})
+				break
+	
 	var layer: BaseLayer
 	if group:
-		layer = GroupLayer.new(project, layer_name)
+		layer = GroupLayer.new(project, unique_name)
 	else:
-		layer = PixelLayer.new(project, layer_name)
+		layer = PixelLayer.new(project, unique_name)
 	
 	# We want our new layer to be at the topmost level, but no method exists to
 	# support this. The following is taken from the add_layer method of
