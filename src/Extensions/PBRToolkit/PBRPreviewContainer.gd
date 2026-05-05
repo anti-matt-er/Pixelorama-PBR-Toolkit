@@ -123,7 +123,26 @@ func create_layer(layer_name: String, group: bool) -> BaseLayer:
 		layer = GroupLayer.new(project, layer_name)
 	else:
 		layer = PixelLayer.new(project, layer_name)
-	Global.animation_timeline.add_layer(layer, project)
+	
+	# We want our new layer to be at the topmost level, but no method exists to
+	# support this. The following is taken from the add_layer method of
+	# AnimationTimeline.gd but removes the reparenting logic to allow the new
+	# layer to be topmost.
+
+	var cels := []
+	for f in project.frames:
+		cels.append(layer.new_empty_cel())
+	
+	var new_layer_idx = project.layers.size()
+	
+	project.undo_redo.create_action("Add Layer")
+	project.undo_redo.add_do_method(project.add_layers.bind([layer], [new_layer_idx], [cels]))
+	project.undo_redo.add_undo_method(project.remove_layers.bind([new_layer_idx]))
+	project.undo_redo.add_do_method(project.change_cel.bind(-1, new_layer_idx))
+	project.undo_redo.add_undo_method(project.change_cel.bind(-1, project.current_layer))
+	project.undo_redo.add_do_method(Global.undo_or_redo.bind(false))
+	project.undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
+	project.undo_redo.commit_action()
 	
 	return layer
 
