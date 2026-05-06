@@ -6,6 +6,7 @@
 metallic = 1.0
 emission_enabled = true
 normal_enabled = true
+ao_enabled = true
 texture_filter = 0
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_1ih51"]

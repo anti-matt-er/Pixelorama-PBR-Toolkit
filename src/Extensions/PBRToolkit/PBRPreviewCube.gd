@@ -8,12 +8,14 @@ extends MeshInstance3D
 @onready var metallic := ImageTexture.new()
 @onready var roughness := ImageTexture.new()
 @onready var emission := ImageTexture.new()
+@onready var ambient_occlusion := ImageTexture.new()
 @onready var normal := ImageTexture.new()
 
 var default_albedo: Image
 var default_metallic: Image
 var default_roughness: Image
 var default_emission: Image
+var default_ambient_occlusion: Image
 var default_normal: Image
 
 
@@ -33,18 +35,21 @@ func _ready() -> void:
 	default_metallic = black_image
 	default_roughness = white_image
 	default_emission = black_image
+	default_ambient_occlusion = white_image
 	default_normal = normal_image
 	
 	albedo.set_image(default_albedo)
 	metallic.set_image(default_metallic)
 	roughness.set_image(default_roughness)
 	emission.set_image(default_emission)
+	ambient_occlusion.set_image(default_ambient_occlusion)
 	normal.set_image(default_normal)
 	
 	material.albedo_texture = albedo
 	material.metallic_texture = metallic
 	material.roughness_texture = roughness
 	material.emission_texture = emission
+	material.ao_texture = ambient_occlusion
 	material.normal_texture = normal
 	
 	albedo.changed.connect(check_alpha)

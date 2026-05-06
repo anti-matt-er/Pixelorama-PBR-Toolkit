@@ -16,7 +16,7 @@ shader_parameter/color1 = Color(0.7, 0.7, 0.7, 1)
 shader_parameter/color2 = Color(1, 1, 1, 1)
 shader_parameter/offset = Vector2(0, 0)
 shader_parameter/scale = Vector2(0, 0)
-shader_parameter/rect_size = Vector2(0, 100)
+shader_parameter/rect_size = Vector2(288, 100)
 shader_parameter/follow_movement = false
 shader_parameter/follow_scale = false
 
@@ -219,6 +219,30 @@ layout_mode = 2
 texture_normal = ExtResource("6_ncvrd")
 
 [node name="EmissionGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1176899399]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("7_vivy3")
+
+[node name="AmbientOcclusion" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=1919368672]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=703698596]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "AO:"
+
+[node name="AmbientOcclusionOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=1866410234]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AmbientOcclusionLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=2042949765]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("6_ncvrd")
+
+[node name="AmbientOcclusionGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=443837872]
 unique_name_in_owner = true
 layout_mode = 2
 texture_normal = ExtResource("7_vivy3")

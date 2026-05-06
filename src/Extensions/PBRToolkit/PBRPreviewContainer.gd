@@ -24,6 +24,9 @@ const MAX_ZOOM_Z := 10.0
 @onready var emission_option_button: OptionButton = %EmissionOptionButton
 @onready var emission_layer_button: BaseButton = %EmissionLayerButton
 @onready var emission_group_button: BaseButton = %EmissionGroupButton
+@onready var ambient_occlusion_option_button: OptionButton = %AmbientOcclusionOptionButton
+@onready var ambient_occlusion_layer_button: BaseButton = %AmbientOcclusionLayerButton
+@onready var ambient_occlusion_group_button: BaseButton = %AmbientOcclusionGroupButton
 @onready var normal_option_button: OptionButton = %NormalOptionButton
 @onready var normal_layer_button: BaseButton = %NormalLayerButton
 @onready var normal_group_button: BaseButton = %NormalGroupButton
@@ -60,6 +63,9 @@ func _ready() -> void:
 	emission_option_button.item_selected.connect(_update_emission)
 	emission_layer_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", false))
 	emission_group_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", true))
+	ambient_occlusion_option_button.item_selected.connect(_update_ambient_occlusion)
+	ambient_occlusion_layer_button.pressed.connect(create_and_assign_layer.bind(ambient_occlusion_option_button, "AO", false))
+	ambient_occlusion_group_button.pressed.connect(create_and_assign_layer.bind(ambient_occlusion_option_button, "AO", true))
 	normal_option_button.item_selected.connect(_update_normal)
 	normal_layer_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", false))
 	normal_group_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", true))
@@ -176,6 +182,7 @@ func _update_layers() -> void:
 	var previous_metallic: BaseLayer
 	var previous_roughness: BaseLayer
 	var previous_emission: BaseLayer
+	var previous_ambient_occlusion: BaseLayer
 	var previous_normal: BaseLayer
 	
 	if not layers.is_empty():
@@ -187,6 +194,8 @@ func _update_layers() -> void:
 			previous_roughness = layers[roughness_option_button.selected-1]
 		if emission_option_button.selected > 0 and layers.size() >= emission_option_button.selected:
 			previous_emission = layers[emission_option_button.selected-1]
+		if ambient_occlusion_option_button.selected > 0 and layers.size() >= ambient_occlusion_option_button.selected:
+			previous_ambient_occlusion = layers[ambient_occlusion_option_button.selected-1]
 		if normal_option_button.selected > 0 and layers.size() >= normal_option_button.selected:
 			previous_normal = layers[normal_option_button.selected-1]
 	
@@ -202,6 +211,7 @@ func _update_layers() -> void:
 		metallic_option_button,
 		roughness_option_button,
 		emission_option_button,
+		ambient_occlusion_option_button,
 		normal_option_button
 	]:
 		option_button.clear()
@@ -219,6 +229,8 @@ func _update_layers() -> void:
 			roughness_option_button.select(layers.find(previous_roughness)+1)
 		if previous_emission and layers.has(previous_emission):
 			emission_option_button.select(layers.find(previous_emission)+1)
+		if previous_ambient_occlusion and layers.has(previous_ambient_occlusion):
+			ambient_occlusion_option_button.select(layers.find(previous_ambient_occlusion)+1)
 		if previous_normal and layers.has(previous_normal):
 			normal_option_button.select(layers.find(previous_normal)+1)
 
@@ -249,6 +261,13 @@ func _update_emission(layer_number: int) -> void:
 		pbr_preview_cube.emission.set_image(pbr_preview_cube.default_emission)
 	else:
 		pbr_preview_cube.emission.set_image(get_layer_image(layers[layer_number-1]))
+
+
+func _update_ambient_occlusion(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.ambient_occlusion.set_image(pbr_preview_cube.default_ambient_occlusion)
+	else:
+		pbr_preview_cube.ambient_occlusion.set_image(get_layer_image(layers[layer_number-1]))
 
 
 func _update_normal(layer_number: int) -> void:
