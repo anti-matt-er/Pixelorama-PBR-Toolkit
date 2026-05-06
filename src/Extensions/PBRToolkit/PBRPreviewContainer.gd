@@ -160,7 +160,7 @@ func get_layer_image(layer: BaseLayer) -> Image:
 	return layer_image
 
 
-func create_layer(layer_name: String, group: bool) -> BaseLayer:
+func create_layer(layer_name: String, default_image: Image, group: bool) -> BaseLayer:
 	var project := Global.current_project
 	
 	var unique_name := layer_name
@@ -192,7 +192,10 @@ func create_layer(layer_name: String, group: bool) -> BaseLayer:
 
 	var cels := []
 	for f in project.frames:
-		cels.append(layer.new_empty_cel())
+		var cel = layer.new_empty_cel()
+		if !group:
+			cel.get_image().fill(default_image.get_pixel(0, 0))
+		cels.append(cel)
 	
 	var new_layer_idx = project.layers.size()
 	
@@ -209,7 +212,7 @@ func create_layer(layer_name: String, group: bool) -> BaseLayer:
 
 
 func create_and_assign_layer(pbr_data: PBRData, group: bool) -> void:
-	var layer = create_layer(pbr_data.layer_name, group)
+	var layer = create_layer(pbr_data.layer_name, pbr_data.default_image, group)
 	var layer_index := layers[Global.current_project_index].find(layer)
 	pbr_data.option_button.select(layer_index+1)
 	pbr_data.option_button.item_selected.emit(layer_index+1)
