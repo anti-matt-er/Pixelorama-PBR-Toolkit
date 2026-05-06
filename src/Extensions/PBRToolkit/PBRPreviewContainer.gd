@@ -1,3 +1,4 @@
+class_name PBRPreviewContainer
 extends PanelContainer
 
 
@@ -6,32 +7,89 @@ const ZOOM_INCREMENT := 0.1
 const MIN_ZOOM_Z := 0.502 # +0.002 to account for camera near-clip of 0.001
 const MAX_ZOOM_Z := 10.0
 
+class PBRData:
+	var layer_name: String
+	var option_button: OptionButton
+	var layer_button: BaseButton
+	var group_button: BaseButton
+	var texture: ImageTexture
+	var default_image: Image
+	
+	func _init(container: PBRPreviewContainer, layer_name: String, option_button: OptionButton, layer_button: BaseButton, group_button: BaseButton, texture: ImageTexture, default_image: Image) -> void:
+		self.layer_name = layer_name
+		self.option_button = option_button
+		self.layer_button = layer_button
+		self.group_button = group_button
+		self.texture = texture
+		self.default_image = default_image
+		
+		option_button.item_selected.connect(container._update_texture.bind(self))
+		layer_button.pressed.connect(container.create_and_assign_layer.bind(self, false))
+		group_button.pressed.connect(container.create_and_assign_layer.bind(self, true))
+
 @onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
 @onready var preview_zoom_slider: VSlider = %PreviewZoomSlider
 @onready var preview_reset_button: BaseButton = %PreviewResetButton
 @onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
 @onready var camera: Camera3D = %Camera
 @onready var initial_camera_pos := camera.position
-@onready var albedo_option_button: OptionButton = %AlbedoOptionButton
-@onready var albedo_layer_button: BaseButton = %AlbedoLayerButton
-@onready var albedo_group_button: BaseButton = %AlbedoGroupButton
-@onready var metallic_option_button: OptionButton = %MetallicOptionButton
-@onready var metallic_layer_button: BaseButton = %MetallicLayerButton
-@onready var metallic_group_button: BaseButton = %MetallicGroupButton
-@onready var roughness_option_button: OptionButton = %RoughnessOptionButton
-@onready var roughness_layer_button: BaseButton = %RoughnessLayerButton
-@onready var roughness_group_button: BaseButton = %RoughnessGroupButton
-@onready var emission_option_button: OptionButton = %EmissionOptionButton
-@onready var emission_layer_button: BaseButton = %EmissionLayerButton
-@onready var emission_group_button: BaseButton = %EmissionGroupButton
-@onready var ambient_occlusion_option_button: OptionButton = %AmbientOcclusionOptionButton
-@onready var ambient_occlusion_layer_button: BaseButton = %AmbientOcclusionLayerButton
-@onready var ambient_occlusion_group_button: BaseButton = %AmbientOcclusionGroupButton
-@onready var normal_option_button: OptionButton = %NormalOptionButton
-@onready var normal_layer_button: BaseButton = %NormalLayerButton
-@onready var normal_group_button: BaseButton = %NormalGroupButton
+@onready var albedo := PBRData.new(
+	self,
+	"Albedo",
+	%AlbedoOptionButton,
+	%AlbedoLayerButton,
+	%AlbedoGroupButton,
+	pbr_preview_cube.albedo,
+	pbr_preview_cube.default_albedo
+)
+@onready var metallic := PBRData.new(
+	self,
+	"Metallic",
+	%MetallicOptionButton,
+	%MetallicLayerButton,
+	%MetallicGroupButton,
+	pbr_preview_cube.metallic,
+	pbr_preview_cube.default_metallic
+)
+@onready var roughness := PBRData.new(
+	self,
+	"Roughness",
+	%RoughnessOptionButton,
+	%RoughnessLayerButton,
+	%RoughnessGroupButton,
+	pbr_preview_cube.roughness,
+	pbr_preview_cube.default_roughness
+)
+@onready var emission := PBRData.new(
+	self,
+	"Emission",
+	%EmissionOptionButton,
+	%EmissionLayerButton,
+	%EmissionGroupButton,
+	pbr_preview_cube.emission,
+	pbr_preview_cube.default_emission
+)
+@onready var ambient_occlusion := PBRData.new(
+	self,
+	"AO",
+	%AmbientOcclusionOptionButton,
+	%AmbientOcclusionLayerButton,
+	%AmbientOcclusionGroupButton,
+	pbr_preview_cube.ambient_occlusion,
+	pbr_preview_cube.default_ambient_occlusion
+)
+@onready var normal := PBRData.new(
+	self,
+	"Normal",
+	%NormalOptionButton,
+	%NormalLayerButton,
+	%NormalGroupButton,
+	pbr_preview_cube.normal,
+	pbr_preview_cube.default_normal
+)
 
-var layers: Array[BaseLayer] = []
+var layers: Dictionary[int, Array] = {}
+var selected_layers: Dictionary[int, Dictionary] = {}
 var rotating_preview := false
 var rotating_preview_start_position := Vector2.ZERO
 var accumulated_preview_rotation := Vector2.ZERO
@@ -41,7 +99,6 @@ var accumulated_preview_drag := Vector2.ZERO
 
 
 func _ready() -> void:
-	Global.current_project.layers_updated.connect(_update_layers)
 	Global.project_switched.connect(_update_layers)
 	Global.project_data_changed.connect(_on_project_data_changed)
 	Global.cel_switched.connect(_update_all_textures)
@@ -50,25 +107,6 @@ func _ready() -> void:
 	preview_zoom_slider.value_changed.connect(zoom_camera_from_slider)
 	preview_reset_button.pressed.connect(reset_camera)
 	update_zoom_slider()
-	
-	albedo_option_button.item_selected.connect(_update_albedo)
-	albedo_layer_button.pressed.connect(create_and_assign_layer.bind(albedo_option_button, "Albedo", false))
-	albedo_group_button.pressed.connect(create_and_assign_layer.bind(albedo_option_button, "Albedo", true))
-	metallic_option_button.item_selected.connect(_update_metallic)
-	metallic_layer_button.pressed.connect(create_and_assign_layer.bind(metallic_option_button, "Metallic", false))
-	metallic_group_button.pressed.connect(create_and_assign_layer.bind(metallic_option_button, "Metallic", true))
-	roughness_option_button.item_selected.connect(_update_roughness)
-	roughness_layer_button.pressed.connect(create_and_assign_layer.bind(roughness_option_button, "Roughness", false))
-	roughness_group_button.pressed.connect(create_and_assign_layer.bind(roughness_option_button, "Roughness", true))
-	emission_option_button.item_selected.connect(_update_emission)
-	emission_layer_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", false))
-	emission_group_button.pressed.connect(create_and_assign_layer.bind(emission_option_button, "Emission", true))
-	ambient_occlusion_option_button.item_selected.connect(_update_ambient_occlusion)
-	ambient_occlusion_layer_button.pressed.connect(create_and_assign_layer.bind(ambient_occlusion_option_button, "AO", false))
-	ambient_occlusion_group_button.pressed.connect(create_and_assign_layer.bind(ambient_occlusion_option_button, "AO", true))
-	normal_option_button.item_selected.connect(_update_normal)
-	normal_layer_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", false))
-	normal_group_button.pressed.connect(create_and_assign_layer.bind(normal_option_button, "Normal", true))
 	
 	_update_all_textures()
 
@@ -170,119 +208,75 @@ func create_layer(layer_name: String, group: bool) -> BaseLayer:
 	return layer
 
 
-func create_and_assign_layer(option_button: OptionButton, layer_name: String, group: bool) -> void:
-	var layer = create_layer(layer_name, group)
-	var layer_index := layers.find(layer)
-	option_button.select(layer_index+1)
-	option_button.item_selected.emit(layer_index+1)
+func create_and_assign_layer(pbr_data: PBRData, group: bool) -> void:
+	var layer = create_layer(pbr_data.layer_name, group)
+	var layer_index := layers[Global.current_project_index].find(layer)
+	pbr_data.option_button.select(layer_index+1)
+	pbr_data.option_button.item_selected.emit(layer_index+1)
 
 
 func _update_layers() -> void:
-	var previous_albedo: BaseLayer
-	var previous_metallic: BaseLayer
-	var previous_roughness: BaseLayer
-	var previous_emission: BaseLayer
-	var previous_ambient_occlusion: BaseLayer
-	var previous_normal: BaseLayer
-	
-	if not layers.is_empty():
-		if albedo_option_button.selected > 0 and layers.size() >= albedo_option_button.selected:
-			previous_albedo = layers[albedo_option_button.selected-1]
-		if metallic_option_button.selected > 0 and layers.size() >= metallic_option_button.selected:
-			previous_metallic = layers[metallic_option_button.selected-1]
-		if roughness_option_button.selected > 0 and layers.size() >= roughness_option_button.selected:
-			previous_roughness = layers[roughness_option_button.selected-1]
-		if emission_option_button.selected > 0 and layers.size() >= emission_option_button.selected:
-			previous_emission = layers[emission_option_button.selected-1]
-		if ambient_occlusion_option_button.selected > 0 and layers.size() >= ambient_occlusion_option_button.selected:
-			previous_ambient_occlusion = layers[ambient_occlusion_option_button.selected-1]
-		if normal_option_button.selected > 0 and layers.size() >= normal_option_button.selected:
-			previous_normal = layers[normal_option_button.selected-1]
-	
 	var project = Global.current_project
-	layers = project.layers.duplicate()
+	if not project.layers_updated.is_connected(_update_layers):
+		project.layers_updated.connect(_update_layers)
 	
-	for layer in layers:
+	var project_layers: Array[BaseLayer] = project.layers.duplicate()
+	layers[Global.current_project_index] = project_layers
+	
+	for layer in project_layers:
 		if not layer.name_changed.is_connected(_update_layers):
 			layer.name_changed.connect(_update_layers)
 	
 	for option_button: OptionButton in [
-		albedo_option_button,
-		metallic_option_button,
-		roughness_option_button,
-		emission_option_button,
-		ambient_occlusion_option_button,
-		normal_option_button
+		albedo.option_button,
+		metallic.option_button,
+		roughness.option_button,
+		emission.option_button,
+		ambient_occlusion.option_button,
+		normal.option_button
 	]:
 		option_button.clear()
 		option_button.add_item("")
 		
-		for i in range(layers.size()):
-			option_button.add_item(layers[i].name, i+1)
+		for i in range(project_layers.size()):
+			option_button.add_item(project_layers[i].name, i+1)
 	
-	if not layers.is_empty():
-		if previous_albedo and layers.has(previous_albedo):
-			albedo_option_button.select(layers.find(previous_albedo)+1)
-		if previous_metallic and layers.has(previous_metallic):
-			metallic_option_button.select(layers.find(previous_metallic)+1)
-		if previous_roughness and layers.has(previous_roughness):
-			roughness_option_button.select(layers.find(previous_roughness)+1)
-		if previous_emission and layers.has(previous_emission):
-			emission_option_button.select(layers.find(previous_emission)+1)
-		if previous_ambient_occlusion and layers.has(previous_ambient_occlusion):
-			ambient_occlusion_option_button.select(layers.find(previous_ambient_occlusion)+1)
-		if previous_normal and layers.has(previous_normal):
-			normal_option_button.select(layers.find(previous_normal)+1)
+	if not project_layers.is_empty() and selected_layers.has(Global.current_project_index):
+		var selected = selected_layers[Global.current_project_index]
+		if selected.has("Albedo") and selected.Albedo and project_layers.has(selected.Albedo):
+			albedo.option_button.select(project_layers.find(selected.Albedo)+1)
+		if selected.has("Metallic") and selected.Metallic and project_layers.has(selected.Metallic):
+			metallic.option_button.select(project_layers.find(selected.Metallic)+1)
+		if selected.has("Roughness") and selected.Roughness and project_layers.has(selected.Roughness):
+			roughness.option_button.select(project_layers.find(selected.Roughness)+1)
+		if selected.has("Emission") and selected.Emission and project_layers.has(selected.Emission):
+			emission.option_button.select(project_layers.find(selected.Emission)+1)
+		if selected.has("AO") and selected.AO and project_layers.has(selected.AO):
+			ambient_occlusion.option_button.select(project_layers.find(selected.AO)+1)
+		if selected.has("Normal") and selected.Normal and project_layers.has(selected.Normal):
+			normal.option_button.select(project_layers.find(selected.Normal)+1)
 
 
-func _update_albedo(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.albedo.set_image(pbr_preview_cube.default_albedo)
+func _update_texture(layer_number: int, pbr_data: PBRData) -> void:
+	var project_layers: Array[BaseLayer] = layers.get(Global.current_project_index, [] as Array[BaseLayer])
+	if not selected_layers.has(Global.current_project_index):
+		selected_layers[Global.current_project_index] = {}
+	if layer_number <= 0 || project_layers.size() < layer_number:
+		selected_layers[Global.current_project_index][pbr_data.layer_name] = null
+		pbr_data.texture.set_image(pbr_data.default_image)
 	else:
-		pbr_preview_cube.albedo.set_image(get_layer_image(layers[layer_number-1]))
-
-
-func _update_metallic(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.metallic.set_image(pbr_preview_cube.default_metallic)
-	else:
-		pbr_preview_cube.metallic.set_image(get_layer_image(layers[layer_number-1]))
-
-
-func _update_roughness(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.roughness.set_image(pbr_preview_cube.default_roughness)
-	else:
-		pbr_preview_cube.roughness.set_image(get_layer_image(layers[layer_number-1]))
-
-
-func _update_emission(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.emission.set_image(pbr_preview_cube.default_emission)
-	else:
-		pbr_preview_cube.emission.set_image(get_layer_image(layers[layer_number-1]))
-
-
-func _update_ambient_occlusion(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.ambient_occlusion.set_image(pbr_preview_cube.default_ambient_occlusion)
-	else:
-		pbr_preview_cube.ambient_occlusion.set_image(get_layer_image(layers[layer_number-1]))
-
-
-func _update_normal(layer_number: int) -> void:
-	if layer_number <= 0 || layers.size() < layer_number:
-		pbr_preview_cube.normal.set_image(pbr_preview_cube.default_normal)
-	else:
-		pbr_preview_cube.normal.set_image(get_layer_image(layers[layer_number-1]))
+		var layer := project_layers[layer_number-1]
+		selected_layers[Global.current_project_index][pbr_data.layer_name] = layer
+		pbr_data.texture.set_image(get_layer_image(layer))
 
 
 func _update_all_textures() -> void:
-	_update_albedo(albedo_option_button.selected)
-	_update_metallic(metallic_option_button.selected)
-	_update_roughness(roughness_option_button.selected)
-	_update_emission(emission_option_button.selected)
-	_update_normal(normal_option_button.selected)
+	_update_texture(albedo.option_button.selected, albedo)
+	_update_texture(metallic.option_button.selected, metallic)
+	_update_texture(roughness.option_button.selected, roughness)
+	_update_texture(emission.option_button.selected, emission)
+	_update_texture(ambient_occlusion.option_button.selected, ambient_occlusion)
+	_update_texture(normal.option_button.selected, normal)
 
 
 func update_zoom_slider() -> void:
