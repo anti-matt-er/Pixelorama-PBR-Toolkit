@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://pvkweap342n0"]
+
+[ext_resource type="Script" uid="uid://ctdir4jiaudsr" path="res://src/Extensions/PBRToolkit/PBRToolkit.gd" id="1_gsmtc"]
+
+[node name="PBRToolkit" type="Node" unique_id=1292898069]
+script = ExtResource("1_gsmtc")

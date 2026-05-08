@@ -1,0 +1,12 @@
+{
+	"name": "PBRToolkit",
+	"display_name": "PBR Toolkit",
+	"description": "Create PBR (Physically Based Rendering) assets and preview them in realtime.",
+	"author": "anti-matt-er",
+	"version": "0.1",
+	"supported_api_versions": [8],
+	"license": "MIT",
+	"nodes": [
+        "PBRToolkit.tscn"
+	]
+}
