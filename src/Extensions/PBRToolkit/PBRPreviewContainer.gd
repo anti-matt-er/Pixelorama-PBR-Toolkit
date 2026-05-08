@@ -1,0 +1,181 @@
+extends PanelContainer
+
+
+const ROTATION_SPEED := 0.005
+
+@onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
+@onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
+@onready var albedo_option_button: OptionButton = %AlbedoOptionButton
+@onready var metallic_option_button: OptionButton = %MetallicOptionButton
+@onready var roughness_option_button: OptionButton = %RoughnessOptionButton
+@onready var normal_option_button: OptionButton = %NormalOptionButton
+
+var layers: Array[BaseLayer] = []
+var rotating_preview := false
+var rotating_preview_start_position := Vector2.ZERO
+
+
+func _ready() -> void:
+	Global.current_project.layers_updated.connect(_update_layers)
+	Global.project_switched.connect(_update_layers)
+	Global.project_data_changed.connect(_on_project_data_changed)
+	Global.cel_switched.connect(_update_all_textures)
+	
+	preview_viewport.gui_input.connect(_preview_viewport_gui_input)
+	
+	albedo_option_button.item_selected.connect(_update_albedo)
+	metallic_option_button.item_selected.connect(_update_metallic)
+	roughness_option_button.item_selected.connect(_update_roughness)
+	normal_option_button.item_selected.connect(_update_normal)
+	
+	_update_all_textures()
+
+
+func _on_project_data_changed(_project: Project) -> void:
+	_update_all_textures()
+
+
+func start_rotating_preview() -> void:
+	rotating_preview = true
+	rotating_preview_start_position = get_global_mouse_position()
+
+
+func stop_rotating_preview() -> void:
+	rotating_preview = false
+
+
+func get_layer_image(layer: BaseLayer) -> Image:
+	var project := Global.current_project
+	var layer_was_visible = layer.visible
+	
+	var layers_to_rehide = []
+	for other_layer in project.layers:
+		if other_layer.is_ancestor_of(layer) and not other_layer.visible:
+			layers_to_rehide.append(other_layer)
+			other_layer.visible = true
+	layer.visible = true
+	
+	var layers_to_unhide = []
+	for other_layer in project.layers:
+		if other_layer == layer:
+			continue
+		if layer.is_ancestor_of(other_layer) || other_layer.is_ancestor_of(layer):
+			continue
+		if other_layer.visible:
+			layers_to_unhide.append(other_layer)
+			other_layer.visible = false
+	
+	var current_frame := project.frames[project.current_frame]
+	
+	var layer_image: Image
+	
+	if layer is GroupLayer:
+		layer_image = layer.blend_children(current_frame)
+	else:
+		var current_cel = current_frame.cels[project.layers.find(layer)]
+		layer_image = current_cel.get_image()
+	
+	for other_layer in layers_to_rehide:
+		other_layer.visible = false
+		
+	layer.visible = layer_was_visible
+	
+	for other_layer in layers_to_unhide:
+		other_layer.visible = true
+	
+	for cel in current_frame.cels:
+		cel.update_texture()
+	
+	return layer_image
+
+
+func _update_layers() -> void:
+	var previous_albedo: BaseLayer
+	var previous_metallic: BaseLayer
+	var previous_roughness: BaseLayer
+	var previous_normal: BaseLayer
+	
+	if not layers.is_empty():
+		if albedo_option_button.selected > 0 and layers.size() >= albedo_option_button.selected:
+			previous_albedo = layers[albedo_option_button.selected-1]
+		if metallic_option_button.selected > 0 and layers.size() >= metallic_option_button.selected:
+			previous_metallic = layers[metallic_option_button.selected-1]
+		if roughness_option_button.selected > 0 and layers.size() >= roughness_option_button.selected:
+			previous_roughness = layers[roughness_option_button.selected-1]
+		if normal_option_button.selected > 0 and layers.size() >= normal_option_button.selected:
+			previous_normal = layers[normal_option_button.selected-1]
+	
+	var project = Global.current_project
+	layers = project.layers.duplicate()
+	
+	for option_button: OptionButton in [
+		albedo_option_button,
+		metallic_option_button,
+		roughness_option_button,
+		normal_option_button
+	]:
+		option_button.clear()
+		option_button.add_item("")
+		
+		for i in range(layers.size()):
+			option_button.add_item(layers[i].name, i+1)
+	
+	if not layers.is_empty():
+		if previous_albedo and layers.has(previous_albedo):
+			albedo_option_button.select(layers.find(previous_albedo)+1)
+		if previous_metallic and layers.has(previous_metallic):
+			metallic_option_button.select(layers.find(previous_metallic)+1)
+		if previous_roughness and layers.has(previous_roughness):
+			roughness_option_button.select(layers.find(previous_roughness)+1)
+		if previous_normal and layers.has(previous_normal):
+			normal_option_button.select(layers.find(previous_normal)+1)
+
+
+func _update_albedo(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.albedo.set_image(pbr_preview_cube.default_albedo)
+	else:
+		pbr_preview_cube.albedo.set_image(get_layer_image(layers[layer_number-1]))
+
+
+func _update_metallic(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.metallic.set_image(pbr_preview_cube.default_metallic)
+	else:
+		pbr_preview_cube.metallic.set_image(get_layer_image(layers[layer_number-1]))
+
+
+func _update_roughness(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.roughness.set_image(pbr_preview_cube.default_roughness)
+	else:
+		pbr_preview_cube.roughness.set_image(get_layer_image(layers[layer_number-1]))
+
+
+func _update_normal(layer_number: int) -> void:
+	if layer_number <= 0 || layers.size() < layer_number:
+		pbr_preview_cube.normal.set_image(pbr_preview_cube.default_normal)
+	else:
+		pbr_preview_cube.normal.set_image(get_layer_image(layers[layer_number-1]))
+
+
+func _update_all_textures() -> void:
+	_update_albedo(albedo_option_button.selected)
+	_update_metallic(metallic_option_button.selected)
+	_update_roughness(roughness_option_button.selected)
+	_update_normal(normal_option_button.selected)
+
+
+func _preview_viewport_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+		start_rotating_preview()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_released():
+		stop_rotating_preview()
+	
+	if rotating_preview:
+		var delta_mouse := get_global_mouse_position() - rotating_preview_start_position
+		pbr_preview_cube.rotation.y = delta_mouse.x * ROTATION_SPEED
+		pbr_preview_cube.rotation.x = delta_mouse.y * ROTATION_SPEED

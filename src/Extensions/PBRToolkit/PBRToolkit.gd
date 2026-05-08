@@ -1,6 +1,6 @@
 extends Node
 
-const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/TestPreviewPanel.tscn")
+const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/PBRPreviewContainer.tscn")
 const PREVIEW_PANEL_NAME := "PBR Preview"
 
 var api: Node

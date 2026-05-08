@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://b22gne280pn7q"]
+
+[ext_resource type="Script" path="res://src/Extensions/PBRToolkit/PBRPreviewContainer.gd" id="1_3lcye"]
+[ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/TransparentChecker.tscn" id="2_ei0xn"]
+[ext_resource type="Shader" uid="uid://bggsv8qqty6kw" path="res://src/Extensions/PBRToolkit/TransparentChecker.gdshader" id="3_s7gaa"]
+[ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
+[ext_resource type="Script" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.gd" id="4_3lcye"]
+
+[sub_resource type="ShaderMaterial" id="1"]
+shader = ExtResource("3_s7gaa")
+shader_parameter/size = 10.0
+shader_parameter/alpha = 1.0
+shader_parameter/color1 = Color(0.7, 0.7, 0.7, 1)
+shader_parameter/color2 = Color(1, 1, 1, 1)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/scale = Vector2(0, 0)
+shader_parameter/rect_size = Vector2(0, 0)
+shader_parameter/follow_movement = false
+shader_parameter/follow_scale = false
+
+[node name="PBRPreviewContainer" type="PanelContainer" unique_id=1665289064]
+custom_minimum_size = Vector2(0, 110)
+offset_right = 328.0
+offset_bottom = 174.0
+script = ExtResource("1_3lcye")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=449623774]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="VBox" unique_id=359535911]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBox/HBox" unique_id=1082567405]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/HBox/VBoxContainer" unique_id=2123199402]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "+"
+
+[node name="PreviewZoomSlider" type="VSlider" parent="VBox/HBox/VBoxContainer" unique_id=1185696676]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+mouse_default_cursor_shape = 2
+min_value = 1.0
+max_value = 5.0
+step = 0.01
+value = 1.0
+
+[node name="Label2" type="Label" parent="VBox/HBox/VBoxContainer" unique_id=745124252]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "-"
+
+[node name="PreviewViewportContainer" type="SubViewportContainer" parent="VBox/HBox" unique_id=573890257]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="VBox/HBox/PreviewViewportContainer" unique_id=1001948000]
+transparent_bg = true
+handle_input_locally = false
+canvas_item_default_texture_filter = 0
+size = Vector2i(308, 100)
+render_target_update_mode = 4
+
+[node name="TransparentChecker" parent="VBox/HBox/PreviewViewportContainer/SubViewport" unique_id=834267784 instance=ExtResource("2_ei0xn")]
+visible = false
+material = SubResource("1")
+
+[node name="PBRPreviewCube" parent="VBox/HBox/PreviewViewportContainer/SubViewport" unique_id=297023072 instance=ExtResource("3_tkadt")]
+unique_name_in_owner = true
+script = ExtResource("4_3lcye")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="VBox/HBox/PreviewViewportContainer/SubViewport" unique_id=2017978391]
+transform = Transform3D(0.7071068, 0, -0.7071068, 0.49999997, 0.70710677, 0.49999997, 0.5, -0.7071068, 0.5, 0, 0, 2)
+
+[node name="Camera3D" type="Camera3D" parent="VBox/HBox/PreviewViewportContainer/SubViewport" unique_id=750239881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
+current = true
+
+[node name="CelSelectionContainer" type="VBoxContainer" parent="VBox" unique_id=414428403]
+layout_mode = 2
+
+[node name="Albedo" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=236736350]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Albedo" unique_id=1611807877]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Albedo:"
+
+[node name="AlbedoOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Albedo" unique_id=1167449700]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Metallic" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=323814586]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Metallic" unique_id=1695414549]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Metallic:"
+
+[node name="MetallicOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Metallic" unique_id=153537504]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Roughness" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=783590676]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Roughness" unique_id=384607783]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Roughness:"
+
+[node name="RoughnessOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Roughness" unique_id=26601222]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer" unique_id=378153432]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/CelSelectionContainer/Normal" unique_id=1095048620]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Normal:"
+
+[node name="NormalOptionButton" type="OptionButton" parent="VBox/CelSelectionContainer/Normal" unique_id=2014742227]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="value_changed" from="VBox/HBox/VBoxContainer/PreviewZoomSlider" to="." method="_on_PreviewZoomSlider_value_changed"]
+[connection signal="mouse_entered" from="VBox/HBox/PreviewViewportContainer" to="." method="_on_PreviewViewportContainer_mouse_entered"]
+[connection signal="mouse_exited" from="VBox/HBox/PreviewViewportContainer" to="." method="_on_PreviewViewportContainer_mouse_exited"]
