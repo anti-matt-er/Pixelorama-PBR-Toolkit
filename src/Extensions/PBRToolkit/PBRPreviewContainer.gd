@@ -108,6 +108,7 @@ func _ready() -> void:
 	preview_reset_button.pressed.connect(reset_camera)
 	update_zoom_slider()
 	
+	_update_layers()
 	_update_all_textures()
 
 
