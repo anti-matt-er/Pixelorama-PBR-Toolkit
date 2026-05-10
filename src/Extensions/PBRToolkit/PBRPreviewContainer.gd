@@ -6,16 +6,20 @@ const ROTATION_SPEED := 0.005
 const ZOOM_INCREMENT := 0.1
 const MIN_ZOOM_Z := 0.502 # +0.002 to account for camera near-clip of 0.001
 const MAX_ZOOM_Z := 10.0
+const TRANSPARENT_CHECKER_SCENE := preload("res://src/UI/Nodes/TransparentChecker.tscn")
+const RELOAD_ICON := preload("res://assets/graphics/misc/icon_reload.png")
+const NEW_LAYER_ICON := preload("res://assets/graphics/layers/new.png")
+const NEW_GROUP_ICON := preload("res://assets/graphics/layers/group_new.png")
 
 class PBRData:
 	var layer_name: String
 	var option_button: OptionButton
-	var layer_button: BaseButton
-	var group_button: BaseButton
+	var layer_button: TextureButton
+	var group_button: TextureButton
 	var texture: ImageTexture
 	var default_image: Image
 	
-	func _init(container: PBRPreviewContainer, layer_name: String, option_button: OptionButton, layer_button: BaseButton, group_button: BaseButton, texture: ImageTexture, default_image: Image) -> void:
+	func _init(container: PBRPreviewContainer, layer_name: String, option_button: OptionButton, layer_button: TextureButton, group_button: TextureButton, texture: ImageTexture, default_image: Image) -> void:
 		self.layer_name = layer_name
 		self.option_button = option_button
 		self.layer_button = layer_button
@@ -27,9 +31,10 @@ class PBRData:
 		layer_button.pressed.connect(container.create_and_assign_layer.bind(self, false))
 		group_button.pressed.connect(container.create_and_assign_layer.bind(self, true))
 
+@onready var preview_container: Control = %PreviewContainer
 @onready var preview_viewport: SubViewportContainer = %PreviewViewportContainer
 @onready var preview_zoom_slider: VSlider = %PreviewZoomSlider
-@onready var preview_reset_button: BaseButton = %PreviewResetButton
+@onready var preview_reset_button: TextureButton = %PreviewResetButton
 @onready var pbr_preview_cube: PBRPreviewCube = %PBRPreviewCube
 @onready var camera: Camera3D = %Camera
 @onready var initial_camera_pos := camera.position
@@ -99,6 +104,8 @@ var accumulated_preview_drag := Vector2.ZERO
 
 
 func _ready() -> void:
+	_setup_ui()
+	
 	Global.project_switched.connect(_update_layers)
 	Global.project_data_changed.connect(_on_project_data_changed)
 	Global.cel_switched.connect(_update_all_textures)
@@ -110,6 +117,27 @@ func _ready() -> void:
 	
 	_update_layers()
 	_update_all_textures()
+
+
+func _setup_ui() -> void:
+	var transparent_checker: ColorRect = TRANSPARENT_CHECKER_SCENE.instantiate()
+	transparent_checker.set_anchors_preset(Control.PRESET_FULL_RECT)
+	preview_container.add_child(transparent_checker)
+	preview_container.move_child(transparent_checker, 0)
+	
+	preview_reset_button.texture_normal = RELOAD_ICON
+	albedo.layer_button.texture_normal = NEW_LAYER_ICON
+	metallic.layer_button.texture_normal = NEW_LAYER_ICON
+	roughness.layer_button.texture_normal = NEW_LAYER_ICON
+	emission.layer_button.texture_normal = NEW_LAYER_ICON
+	ambient_occlusion.layer_button.texture_normal = NEW_LAYER_ICON
+	normal.layer_button.texture_normal = NEW_LAYER_ICON
+	albedo.group_button.texture_normal = NEW_GROUP_ICON
+	metallic.group_button.texture_normal = NEW_GROUP_ICON
+	roughness.group_button.texture_normal = NEW_GROUP_ICON
+	emission.group_button.texture_normal = NEW_GROUP_ICON
+	ambient_occlusion.group_button.texture_normal = NEW_GROUP_ICON
+	normal.group_button.texture_normal = NEW_GROUP_ICON
 
 
 func _on_project_data_changed(_project: Project) -> void:

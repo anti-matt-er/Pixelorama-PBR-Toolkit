@@ -1,24 +1,7 @@
 [gd_scene format=3 uid="uid://b8p0tshq3dilu"]
 
 [ext_resource type="Script" uid="uid://cxmi3px2lanw3" path="res://src/Extensions/PBRToolkit/PBRPreviewContainer.gd" id="1_3lcye"]
-[ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/TransparentChecker.tscn" id="2_ei0xn"]
-[ext_resource type="Shader" uid="uid://bggsv8qqty6kw" path="res://src/Extensions/PBRToolkit/TransparentChecker.gdshader" id="3_s7gaa"]
 [ext_resource type="PackedScene" uid="uid://tfxams5mx4pg" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
-[ext_resource type="Texture2D" uid="uid://bv7ldl8obhawm" path="res://assets/icon_reload.png" id="6_aa0gb"]
-[ext_resource type="Texture2D" uid="uid://d36mlbmq06q4e" path="res://assets/layers/new.png" id="6_ncvrd"]
-[ext_resource type="Texture2D" uid="uid://cmgnc2emsbxni" path="res://assets/layers/group_new.png" id="7_vivy3"]
-
-[sub_resource type="ShaderMaterial" id="1"]
-shader = ExtResource("3_s7gaa")
-shader_parameter/size = 10.0
-shader_parameter/alpha = 1.0
-shader_parameter/color1 = Color(0.7, 0.7, 0.7, 1)
-shader_parameter/color2 = Color(1, 1, 1, 1)
-shader_parameter/offset = Vector2(0, 0)
-shader_parameter/scale = Vector2(0, 0)
-shader_parameter/rect_size = Vector2(288, 100)
-shader_parameter/follow_movement = false
-shader_parameter/follow_scale = false
 
 [sub_resource type="Environment" id="Environment_aa0gb"]
 ambient_light_source = 2
@@ -59,21 +42,13 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "-"
 
-[node name="Control" type="Control" parent="VBox/HBox" unique_id=921294920]
+[node name="PreviewContainer" type="Control" parent="VBox/HBox" unique_id=921294920]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TransparentChecker" parent="VBox/HBox/Control" unique_id=834267784 instance=ExtResource("2_ei0xn")]
-material = SubResource("1")
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PreviewViewportContainer" type="SubViewportContainer" parent="VBox/HBox/Control" unique_id=573890257]
+[node name="PreviewViewportContainer" type="SubViewportContainer" parent="VBox/HBox/PreviewContainer" unique_id=573890257]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
@@ -86,23 +61,23 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="VBox/HBox/Control/PreviewViewportContainer" unique_id=1001948000]
+[node name="SubViewport" type="SubViewport" parent="VBox/HBox/PreviewContainer/PreviewViewportContainer" unique_id=1001948000]
 transparent_bg = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 0
-size = Vector2i(288, 100)
+size = Vector2i(304, 100)
 render_target_update_mode = 4
 
-[node name="PBRPreviewCube" parent="VBox/HBox/Control/PreviewViewportContainer/SubViewport" unique_id=297023072 instance=ExtResource("3_tkadt")]
+[node name="PBRPreviewCube" parent="VBox/HBox/PreviewContainer/PreviewViewportContainer/SubViewport" unique_id=297023072 instance=ExtResource("3_tkadt")]
 unique_name_in_owner = true
 
-[node name="Light" type="DirectionalLight3D" parent="VBox/HBox/Control/PreviewViewportContainer/SubViewport" unique_id=2017978391]
+[node name="Light" type="DirectionalLight3D" parent="VBox/HBox/PreviewContainer/PreviewViewportContainer/SubViewport" unique_id=2017978391]
 transform = Transform3D(0.8660254, 0.25, -0.4330127, 0, 0.8660254, 0.5, 0.5, -0.4330127, 0.75, 0, 0, 2)
 light_indirect_energy = 0.5
 light_volumetric_fog_energy = 0.0
 sky_mode = 1
 
-[node name="Camera" type="Camera3D" parent="VBox/HBox/Control/PreviewViewportContainer/SubViewport" unique_id=750239881]
+[node name="Camera" type="Camera3D" parent="VBox/HBox/PreviewContainer/PreviewViewportContainer/SubViewport" unique_id=750239881]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 environment = SubResource("Environment_aa0gb")
@@ -118,7 +93,6 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 accessibility_name = "Reset camera"
-texture_normal = ExtResource("6_aa0gb")
 
 [node name="CelSelectionContainer" type="FoldableContainer" parent="VBox" unique_id=1858149766]
 layout_mode = 2
@@ -144,12 +118,10 @@ size_flags_horizontal = 3
 [node name="AlbedoLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=190710019]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="AlbedoGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Albedo" unique_id=254958081]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
 
 [node name="Metallic" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=323814586]
 layout_mode = 2
@@ -168,12 +140,10 @@ size_flags_horizontal = 3
 [node name="MetallicLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=183318450]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="MetallicGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Metallic" unique_id=344177190]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
 
 [node name="Roughness" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=783590676]
 layout_mode = 2
@@ -192,12 +162,10 @@ size_flags_horizontal = 3
 [node name="RoughnessLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=895917769]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="RoughnessGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Roughness" unique_id=1716424203]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
 
 [node name="Emission" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=1671843050]
 layout_mode = 2
@@ -216,12 +184,10 @@ size_flags_horizontal = 3
 [node name="EmissionLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1275545039]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="EmissionGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Emission" unique_id=1176899399]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
 
 [node name="AmbientOcclusion" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=1919368672]
 layout_mode = 2
@@ -240,12 +206,10 @@ size_flags_horizontal = 3
 [node name="AmbientOcclusionLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=2042949765]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="AmbientOcclusionGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/AmbientOcclusion" unique_id=443837872]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
 
 [node name="Normal" type="HBoxContainer" parent="VBox/CelSelectionContainer/VBox" unique_id=378153432]
 layout_mode = 2
@@ -264,9 +228,7 @@ size_flags_horizontal = 3
 [node name="NormalLayerButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=60707091]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("6_ncvrd")
 
 [node name="NormalGroupButton" type="TextureButton" parent="VBox/CelSelectionContainer/VBox/Normal" unique_id=1230868211]
 unique_name_in_owner = true
 layout_mode = 2
-texture_normal = ExtResource("7_vivy3")
