@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cxmi3px2lanw3" path="res://src/Extensions/PBRToolkit/PBRPreviewContainer.gd" id="1_3lcye"]
 [ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/TransparentChecker.tscn" id="2_ei0xn"]
 [ext_resource type="Shader" uid="uid://bggsv8qqty6kw" path="res://src/Extensions/PBRToolkit/TransparentChecker.gdshader" id="3_s7gaa"]
-[ext_resource type="PackedScene" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
+[ext_resource type="PackedScene" uid="uid://tfxams5mx4pg" path="res://src/Extensions/PBRToolkit/PBRPreviewCube.tscn" id="3_tkadt"]
 [ext_resource type="Texture2D" uid="uid://bv7ldl8obhawm" path="res://assets/icon_reload.png" id="6_aa0gb"]
 [ext_resource type="Texture2D" uid="uid://d36mlbmq06q4e" path="res://assets/layers/new.png" id="6_ncvrd"]
 [ext_resource type="Texture2D" uid="uid://cmgnc2emsbxni" path="res://assets/layers/group_new.png" id="7_vivy3"]
