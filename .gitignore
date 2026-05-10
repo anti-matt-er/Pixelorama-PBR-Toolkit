@@ -1,3 +1,8 @@
+#Ignore Pixelorama source, include only extension
+*
+!src/Extensions/PBRToolkit/
+!src/Extensions/PBRToolkit/**
+!/*
 
 # Godot-specific ignores
 .import/
@@ -21,6 +26,7 @@ mono_crash.*.json
 
 # macOS ignores
 .DS_Store
+*.DS_Store
 
 # Android ignores
 android/

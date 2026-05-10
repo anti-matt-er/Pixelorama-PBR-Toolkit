@@ -14,6 +14,25 @@ config/name="Pixelorama - PBR Toolkit"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Global="*res://src/Autoload/Global.gd"
+Import="*res://src/Autoload/Import.gd"
+OpenSave="*res://src/Autoload/OpenSave.gd"
+DrawingAlgos="*res://src/Autoload/DrawingAlgos.gd"
+Tools="*res://src/Autoload/Tools.gd"
+Html5FileExchange="*res://src/Autoload/HTML5FileExchange.gd"
+Export="*res://src/Autoload/Export.gd"
+Palettes="*res://src/Autoload/Palettes.gd"
+Keychain="*uid://dgiia2xg7fsud"
+ExtensionsApi="*res://src/Autoload/ExtensionsApi.gd"
+Themes="*res://src/Autoload/Themes.gd"
+Applinks="*uid://bwxc40knpboql"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/aimg_io/plugin.cfg", "res://addons/applinks/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/keychain/plugin.cfg")
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

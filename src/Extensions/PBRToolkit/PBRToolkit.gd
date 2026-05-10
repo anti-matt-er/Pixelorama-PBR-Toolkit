@@ -3,12 +3,10 @@ extends Node
 const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/PBRPreviewContainer.tscn")
 const PREVIEW_PANEL_NAME := "PBR Preview"
 
-var api: Node
-var preview_panel: Control
+var preview_panel: PBRPreviewContainer
 
 
 func _enter_tree() -> void:
-	api = get_node_or_null("/root/ExtensionsApi")
 	add_preview_panel()
 
 
@@ -44,16 +42,16 @@ func add_preview_panel() -> void:
 	preview_panel.name = PREVIEW_PANEL_NAME
 	
 	# Grab the current layout
-	var layout = Global.control.find_child("DockableContainer").layout
+	var layout: DockableLayout = Global.control.find_child("DockableContainer").layout
 	
 	# Hide panel if Canvas Preview panel is also hidden
 	layout.hidden_tabs[PREVIEW_PANEL_NAME] = layout.hidden_tabs.get("Canvas Preview", true)
 	
 	# Add the panel using the api, this adds the panel next to the tools tab which is unwanted
-	await api.panel.add_node_as_tab(preview_panel)
+	await ExtensionsApi.panel.add_node_as_tab(preview_panel)
 	
 	# First we remove it from where the panel api placed it
-	var tabs = api.panel._get_tabs_in_root(layout.root)
+	var tabs := ExtensionsApi.panel._get_tabs_in_root(layout.root)
 	if tabs.size() != 0:
 		tabs[0].remove_node(preview_panel)
 	else:
@@ -70,4 +68,4 @@ func add_preview_panel() -> void:
 
 
 func remove_preview_panel() -> void:
-	api.panel.remove_node_from_tab(preview_panel)
+	ExtensionsApi.panel.remove_node_from_tab(preview_panel)
