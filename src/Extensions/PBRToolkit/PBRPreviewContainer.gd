@@ -380,6 +380,8 @@ func prepare_layers_for_export(pack_orm: bool) -> void:
 		var orm := {}
 		if selected.has("Albedo") and selected["Albedo"]:
 			layers_to_export["Albedo"] = selected["Albedo"]
+		if selected.has("Emission") and selected["Emission"]:
+			layers_to_export["Emission"] = selected["Emission"]
 		if selected.has("Normal") and selected["Normal"]:
 			layers_to_export["Normal"] = selected["Normal"]
 		if selected.has("AO") and selected["AO"]:
