@@ -59,6 +59,7 @@ func setup_dialog_ui() -> void:
 	dialog_pbr_orm_checkbox = CheckBox.new()
 	dialog_pbr_orm_checkbox.text = "Export ORM texture"
 	dialog_pbr_orm_checkbox.toggled.connect(toggle_orm)
+	dialog_pbr_orm_checkbox.disabled = true
 	dialog_pbr_container.add_child(dialog_pbr_orm_checkbox)
 
 
