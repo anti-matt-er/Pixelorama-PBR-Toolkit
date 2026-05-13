@@ -95,6 +95,7 @@ class PBRData:
 
 var layers: Dictionary[int, Array] = {}
 var selected_layers: Dictionary[int, Dictionary] = {}
+var serialized_layers: Dictionary[int, Dictionary] = {}
 var rotating_preview := false
 var rotating_preview_start_position := Vector2.ZERO
 var accumulated_preview_rotation := Vector2.ZERO
@@ -141,6 +142,27 @@ func _setup_ui() -> void:
 
 
 func _on_project_data_changed(_project: Project) -> void:
+	_update_all_textures()
+
+
+func deserialize_layers(_dict: Dictionary, project: Project) -> void:
+	# Wait until deserialization is done. This relies on the fact that OpenSave.open_pxo_file calls
+	# Global.canvas.camera_zoom() regardless of whether it's creating a new project or overwriting
+	# the current blank one, which happens after deserialization
+	await Global.camera.zoom_changed
+	
+	var project_index := Global.projects.find(project)
+	var project_layers = project.get_meta(&"PBRLayers")
+	serialized_layers[project_index] = project_layers
+	
+	if not selected_layers.has(project_index):
+		selected_layers[project_index] = {}
+	for layer_name in project_layers.keys():
+		var layer_index = project_layers[layer_name]
+		if layer_index:
+			selected_layers[project_index][layer_name] = project.layers[layer_index]
+	
+	_update_layers()
 	_update_all_textures()
 
 
@@ -279,6 +301,10 @@ func _update_layers() -> void:
 	if not project.layers_updated.is_connected(_update_layers):
 		project.layers_updated.connect(_update_layers)
 	
+	var deserializer := deserialize_layers.bind(project)
+	if not project.about_to_deserialize.is_connected(deserializer):
+		project.about_to_deserialize.connect(deserializer)
+	
 	var project_layers: Array[BaseLayer] = project.layers.duplicate()
 	layers[Global.current_project_index] = project_layers
 	
@@ -320,13 +346,18 @@ func _update_texture(layer_number: int, pbr_data: PBRData) -> void:
 	var project_layers: Array[BaseLayer] = layers.get(Global.current_project_index, [] as Array[BaseLayer])
 	if not selected_layers.has(Global.current_project_index):
 		selected_layers[Global.current_project_index] = {}
+		serialized_layers[Global.current_project_index] = {}
 	if layer_number <= 0 || project_layers.size() < layer_number:
 		selected_layers[Global.current_project_index][pbr_data.layer_name] = null
+		serialized_layers[Global.current_project_index][pbr_data.layer_name] = null
 		pbr_data.texture.set_image(pbr_data.default_image)
 	else:
 		var layer := project_layers[layer_number-1]
 		selected_layers[Global.current_project_index][pbr_data.layer_name] = layer
+		serialized_layers[Global.current_project_index][pbr_data.layer_name] = layer_number-1
 		pbr_data.texture.set_image(get_layer_image(layer))
+	
+	Global.current_project.set_meta(&"PBRLayers", serialized_layers[Global.current_project_index])
 
 
 func _update_all_textures() -> void:
