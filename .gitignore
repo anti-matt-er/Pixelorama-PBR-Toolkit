@@ -1,5 +1,7 @@
 #Ignore Pixelorama source, include only extension
 *
+!src/
+!src/Extensions/
 !src/Extensions/PBRToolkit/
 !src/Extensions/PBRToolkit/**
 !/*
