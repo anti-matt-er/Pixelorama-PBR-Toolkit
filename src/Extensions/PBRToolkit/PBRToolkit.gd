@@ -1,5 +1,6 @@
 extends Node
 
+const PBR_EXPORTER := preload("res://src/Extensions/PBRToolkit/PBRExport.gd")
 const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/PBRPreviewContainer.tscn")
 const PREVIEW_PANEL_NAME := "PBR Preview"
 
@@ -8,10 +9,22 @@ var preview_panel: PBRPreviewContainer
 
 func _enter_tree() -> void:
 	add_preview_panel()
+	load_exporter()
 
 
 func _exit_tree() -> void:
 	remove_preview_panel()
+	unload_exporter()
+
+
+func load_exporter() -> void:
+	var exporter = PBR_EXPORTER.new(preview_panel)
+	exporter.name = "PBRExport"
+	get_tree().root.add_child(exporter)
+
+
+func unload_exporter() -> void:
+	get_node("/root/PBRExport").queue_free()
 
 
 func insert_string_array_sibling(array: PackedStringArray, needle: String, new_value: String) -> void:

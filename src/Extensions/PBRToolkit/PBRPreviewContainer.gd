@@ -144,7 +144,7 @@ func _on_project_data_changed(_project: Project) -> void:
 	_update_all_textures()
 
 
-func get_layer_image(layer: BaseLayer) -> Image:
+func get_layer_image(layer: BaseLayer, frame_index: int = Global.current_project.current_frame) -> Image:
 	var project := Global.current_project
 	var layer_was_visible = layer.visible
 	
@@ -165,14 +165,14 @@ func get_layer_image(layer: BaseLayer) -> Image:
 			layers_to_unhide.append(other_layer)
 			other_layer.visible = false
 	
-	var current_frame := project.frames[project.current_frame]
+	var frame := project.frames[frame_index]
 	
 	var layer_image: Image
 	
 	if layer is GroupLayer:
-		layer_image = layer.blend_children(current_frame)
+		layer_image = layer.blend_children(frame)
 	else:
-		var current_cel = current_frame.cels[project.layers.find(layer)]
+		var current_cel = frame.cels[project.layers.find(layer)]
 		layer_image = current_cel.get_image()
 	
 	for other_layer in layers_to_rehide:
@@ -183,10 +183,37 @@ func get_layer_image(layer: BaseLayer) -> Image:
 	for other_layer in layers_to_unhide:
 		other_layer.visible = true
 	
-	for cel in current_frame.cels:
+	for cel in frame.cels:
 		cel.update_texture()
 	
 	return layer_image
+
+
+func get_layer_or_composite_image(layer_or_composite: Variant, frame_index: int) -> Image:
+	if layer_or_composite is BaseLayer:
+		return get_layer_image(layer_or_composite, frame_index)
+	elif layer_or_composite is Dictionary:
+		var project := Global.current_project
+		var image := ImageExtended.create_custom(
+			project.size.x, project.size.y, false, project.get_image_format(), project.is_indexed()
+		)
+		var r = get_layer_image(layer_or_composite["r"], frame_index) if layer_or_composite.has("r") else image
+		var g = get_layer_image(layer_or_composite["g"], frame_index) if layer_or_composite.has("g") else image
+		var b = get_layer_image(layer_or_composite["b"], frame_index) if layer_or_composite.has("b") else image
+		
+		for x in range(project.size.x):
+			for y in range(project.size.y):
+				image.set_pixel(x, y, Color(
+					r.get_pixel(x, y).r,
+					g.get_pixel(x, y).g,
+					b.get_pixel(x, y).b
+				))
+		
+		return image
+	else:
+		assert(false, "Must be a layer or composite!")
+	
+	return
 
 
 func create_layer(layer_name: String, default_image: Image, group: bool) -> BaseLayer:
@@ -309,6 +336,57 @@ func _update_all_textures() -> void:
 	_update_texture(emission.option_button.selected, emission)
 	_update_texture(ambient_occlusion.option_button.selected, ambient_occlusion)
 	_update_texture(normal.option_button.selected, normal)
+
+
+func prepare_layers_for_export(pack_orm: bool) -> void:
+	var project := Global.current_project
+	var selected := selected_layers[Global.current_project_index]
+	var export_layers: Array[BaseLayer] = []
+	var export_frames: Array[Frame] = []
+	var layers_to_export := {}
+	
+	if pack_orm:
+		var orm := {}
+		if selected.has("Albedo") and selected["Albedo"]:
+			layers_to_export["Albedo"] = selected["Albedo"]
+		if selected.has("Normal") and selected["Normal"]:
+			layers_to_export["Normal"] = selected["Normal"]
+		if selected.has("AO") and selected["AO"]:
+			orm["r"] = selected["AO"]
+		if selected.has("Roughness") and selected["Roughness"]:
+			orm["g"] = selected["Roughness"]
+		if selected.has("Metallic") and selected["Metallic"]:
+			orm["b"] = selected["Metallic"]
+		if not orm.is_empty():
+			layers_to_export["ORM"] = orm
+	else:
+		for layer_name in selected.keys():
+			var layer = selected[layer_name]
+			if layer:
+				layers_to_export[layer_name] = layer
+	
+	if layers_to_export.is_empty():
+		return
+	
+	for layer_name in layers_to_export.keys():
+		var new_layer := PixelLayer.new(project, layer_name)
+		export_layers.append(new_layer)
+	
+	for frame_index in range(project.frames.size()):
+		var original_frame: Frame = project.frames[frame_index]
+		var cels: Array[BaseCel] = []
+		
+		for layer_name in layers_to_export.keys():
+			var layer = layers_to_export[layer_name]
+			var image := ImageExtended.new()
+			image.copy_from_custom(get_layer_or_composite_image(layer, frame_index))
+			var cel := PixelCel.new(image)
+			cels.append(cel)
+		
+		export_frames.append(Frame.new(cels, original_frame.duration))
+	
+	project.layers = export_layers
+	project.frames = export_frames
 
 
 func update_zoom_slider() -> void:
