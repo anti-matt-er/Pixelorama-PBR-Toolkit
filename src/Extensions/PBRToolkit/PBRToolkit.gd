@@ -3,12 +3,14 @@ extends Node
 const PBR_EXPORTER := preload("res://src/Extensions/PBRToolkit/PBRExport.gd")
 const PICKER_INJECTOR := preload("res://src/Extensions/PBRToolkit/ColorPickerInjector.gd")
 const NORMAL_PICKER_SCENE := preload("res://src/Extensions/PBRToolkit/NormalPicker.tscn")
+const GRAYSCALE_PICKER_SCENE := preload("res://src/Extensions/PBRToolkit/GrayscalePicker.tscn")
 const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/PBRPreviewContainer.tscn")
 const PREVIEW_PANEL_NAME := "PBR Preview"
 
 var preview_panel: PBRPreviewContainer
 var picker_injector: PICKER_INJECTOR
 var normal_picker: NormalPicker
+var grayscale_picker: GrayscalePicker
 
 
 func _enter_tree() -> void:
@@ -44,13 +46,17 @@ func load_picker_injector() -> void:
 	picker_injector = load_global(PICKER_INJECTOR, "ColorPickerInjector")
 	await get_tree().process_frame
 	normal_picker = NORMAL_PICKER_SCENE.instantiate()
+	grayscale_picker = GRAYSCALE_PICKER_SCENE.instantiate()
 	picker_injector.add_picker(normal_picker, "Normal Map")
+	picker_injector.add_picker(grayscale_picker, "Grayscale")
 
 
 func _on_layer_changed(layer_type) -> void:
 	match layer_type:
 		"Normal":
 			picker_injector.switch_picker(normal_picker.id)
+		"Metallic", "Roughness", "AO":
+			picker_injector.switch_picker(grayscale_picker.id)
 		_:
 			picker_injector.revert_picker()
 

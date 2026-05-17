@@ -10,7 +10,6 @@ const TRANSPARENT_CHECKER_SCENE := preload("res://src/UI/Nodes/TransparentChecke
 const RELOAD_ICON := preload("res://assets/graphics/misc/icon_reload.png")
 const NEW_LAYER_ICON := preload("res://assets/graphics/layers/new.png")
 const NEW_GROUP_ICON := preload("res://assets/graphics/layers/group_new.png")
-const NORMAL_PICKER_SCENE := preload("res://src/Extensions/PBRToolkit/NormalPicker.tscn")
 
 class PBRData:
 	var layer_name: String
@@ -297,6 +296,8 @@ func create_and_assign_layer(pbr_data: PBRData, group: bool) -> void:
 	var layer_index := layers[Global.current_project_index].find(layer)
 	pbr_data.option_button.select(layer_index+1)
 	pbr_data.option_button.item_selected.emit(layer_index+1)
+	
+	layer_selected.emit(pbr_data.layer_name)
 
 
 func _update_layers() -> void:

@@ -70,5 +70,5 @@ func _switch_picker(id: int) -> void:
 
 
 func switch_picker(id: int) -> void:
-	panel._on_shape_popup_menu_id_pressed(id)
+	panel._on_shape_popup_menu_id_pressed(last_picker_default_shape)
 	_switch_picker(id)

@@ -14,17 +14,14 @@ const CHECKER_DARK_COLOR := Color(0.5, 0.5, 0.5)
 @onready var slope_slider: HSlider = %SlopeSlider
 @onready var slope_spinbox: SpinBox = %SlopeSpinBox
 
-var previous_color := DEFAULT_COLOR
-
 
 func _ready() -> void:
+	super()
 	picker.gui_input.connect(picker_input)
-	Tools.color_changed.connect(_on_color_changed)
-	Tools.tool_changed.connect(_on_tool_changed)
-	update_color(Tools.get_assigned_color(Tools.picking_color_for))
 	slope_slider.share(slope_spinbox)
 	direction_range.value_changed.connect(_on_direction_changed)
 	slope_slider.value_changed.connect(_on_slope_changed)
+	previous_color = DEFAULT_COLOR
 
 
 func picker_input(_event: InputEvent) -> void:
@@ -46,31 +43,7 @@ func pick_color() -> void:
 		image_coord = image_coord.clamp(Vector2.ZERO, picker_image_size)
 		color = picker_image.get_pixelv(image_coord)
 	
-	if color != previous_color:
-		previous_color = color
-		Tools.assign_color(color, Tools.picking_color_for, false)
-
-
-func pick_alpha(value: float) -> void:
-	var color := Tools.get_assigned_color(Tools.picking_color_for)
-	color.a = value
-	Tools.assign_color(color, Tools.picking_color_for, true)
-
-
-func update_color(color: Color) -> void:
-	update_inputs_from_color(color)
-	
-	
-func _on_color_changed(color_info: Dictionary, _button: int) -> void:
-	update_color(color_info.color)
-
-
-func _on_tool_changed(_tool_name: String, button: int) -> void:
-	update_color(Tools.get_assigned_color(button))
-
-
-func on_swatch_toggled(left: bool) -> void:
-	update_color(Tools.get_assigned_color(MOUSE_BUTTON_LEFT if left else MOUSE_BUTTON_RIGHT))
+	assign_color(color, false)
 
 
 func update_color_from_inputs() -> void:
@@ -89,9 +62,7 @@ func update_color_from_inputs() -> void:
 		(vector.z + 1.0) * 0.5
 	)
 	
-	if color != previous_color:
-		previous_color = color
-		Tools.assign_color(color, Tools.picking_color_for)
+	assign_color(color, true)
 
 
 func update_inputs_from_color(color: Color) -> void:
