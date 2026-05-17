@@ -21,10 +21,6 @@ var pbr_enabled := false
 var orm_enabled := false
 
 
-func _init(preview: PBRPreviewContainer) -> void:
-	preview_panel = preview
-
-
 func _enter_tree() -> void:
 	Global.export_dialog.about_to_preview.connect(on_preview)
 	original_export_script = Export.get_script()

@@ -1,30 +1,58 @@
 extends Node
 
 const PBR_EXPORTER := preload("res://src/Extensions/PBRToolkit/PBRExport.gd")
+const PICKER_INJECTOR := preload("res://src/Extensions/PBRToolkit/ColorPickerInjector.gd")
+const NORMAL_PICKER_SCENE := preload("res://src/Extensions/PBRToolkit/NormalPicker.tscn")
 const PREVIEW_SCENE := preload("res://src/Extensions/PBRToolkit/PBRPreviewContainer.tscn")
 const PREVIEW_PANEL_NAME := "PBR Preview"
 
 var preview_panel: PBRPreviewContainer
+var picker_injector: PICKER_INJECTOR
+var normal_picker: NormalPicker
 
 
 func _enter_tree() -> void:
 	add_preview_panel()
 	load_exporter()
+	load_picker_injector()
 
 
 func _exit_tree() -> void:
 	remove_preview_panel()
-	unload_exporter()
+	unload_global("PBRExport")
+	unload_global("ColorPickerInjector")
+
+
+func load_global(script: Script, global_name: String) -> Object:
+	var instance: Object = script.new()
+	instance.name = global_name
+	get_tree().root.add_child(instance)
+	
+	return instance
+
+
+func unload_global(global_name: String) -> void:
+	get_node("/root/" + global_name).queue_free()
 
 
 func load_exporter() -> void:
-	var exporter = PBR_EXPORTER.new(preview_panel)
-	exporter.name = "PBRExport"
-	get_tree().root.add_child(exporter)
+	var exporter: PBR_EXPORTER = load_global(PBR_EXPORTER, "PBRExport")
+	exporter.preview_panel = preview_panel
 
 
-func unload_exporter() -> void:
-	get_node("/root/PBRExport").queue_free()
+func load_picker_injector() -> void:
+	picker_injector = load_global(PICKER_INJECTOR, "ColorPickerInjector")
+	await get_tree().process_frame
+	normal_picker = NORMAL_PICKER_SCENE.instantiate()
+	picker_injector.add_picker(normal_picker, "Normal Map")
+
+
+func _on_layer_changed(layer_type) -> void:
+	match layer_type:
+		"Normal":
+			picker_injector.switch_picker(normal_picker.id)
+		_:
+			picker_injector.revert_picker()
 
 
 func insert_string_array_sibling(array: PackedStringArray, needle: String, new_value: String) -> void:
@@ -53,6 +81,7 @@ func add_preview_panel() -> void:
 	# Load the panel scene
 	preview_panel = PREVIEW_SCENE.instantiate()
 	preview_panel.name = PREVIEW_PANEL_NAME
+	preview_panel.layer_selected.connect(_on_layer_changed)
 	
 	# Grab the current layout
 	var layout: DockableLayout = Global.control.find_child("DockableContainer").layout

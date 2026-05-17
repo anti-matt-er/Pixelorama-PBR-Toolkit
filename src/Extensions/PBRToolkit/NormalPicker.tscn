@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://cq6mkp4orfygk"]
+
+[ext_resource type="Texture2D" uid="uid://2wovhg05tfu" path="res://src/Extensions/PBRToolkit/assets/normal_picker.png" id="1_e6dud"]
+[ext_resource type="Script" uid="uid://dbrdrqq0cdsqr" path="res://src/Extensions/PBRToolkit/NormalPicker.gd" id="1_rjt1e"]
+[ext_resource type="PackedScene" uid="uid://dhunagigdxcvv" path="res://src/Extensions/PBRToolkit/KnobRange.tscn" id="3_rjt1e"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jm60j"]
+bg_color = Color(0.5019608, 0.5019608, 1, 1)
+
+[node name="NormalPicker" type="VBoxContainer" unique_id=1977876017]
+offset_right = 200.0
+offset_bottom = 198.0
+size_flags_vertical = 3
+script = ExtResource("1_rjt1e")
+
+[node name="Picker" type="PanelContainer" parent="." unique_id=719734470]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_jm60j")
+
+[node name="PickerTexture" type="TextureRect" parent="Picker" unique_id=1699597912]
+unique_name_in_owner = true
+texture_filter = 4
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("1_e6dud")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Inputs" type="VBoxContainer" parent="." unique_id=1181530721]
+layout_mode = 2
+
+[node name="Angles" type="VBoxContainer" parent="Inputs" unique_id=266283241]
+layout_mode = 2
+
+[node name="Direction" type="HBoxContainer" parent="Inputs/Angles" unique_id=1494424786]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DirectionLabel" type="Label" parent="Inputs/Angles/Direction" unique_id=1856946774]
+custom_minimum_size = Vector2(43, 0)
+layout_mode = 2
+text = "Dir"
+
+[node name="DirectionRange" parent="Inputs/Angles/Direction" unique_id=472917550 instance=ExtResource("3_rjt1e")]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 360.0
+
+[node name="Slope" type="HBoxContainer" parent="Inputs/Angles" unique_id=765176789]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlopeLabel" type="Label" parent="Inputs/Angles/Slope" unique_id=1971268098]
+layout_mode = 2
+text = "Slope"
+
+[node name="Spacer" type="Control" parent="Inputs/Angles/Slope" unique_id=267973777]
+custom_minimum_size = Vector2(4, 0)
+layout_mode = 2
+
+[node name="SlopeSlider" type="HSlider" parent="Inputs/Angles/Slope" unique_id=1064885245]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 90.0
+
+[node name="Spacer2" type="Control" parent="Inputs/Angles/Slope" unique_id=333072177]
+custom_minimum_size = Vector2(4, 0)
+layout_mode = 2
+
+[node name="SlopeSpinBox" type="SpinBox" parent="Inputs/Angles/Slope" unique_id=2043096547]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8

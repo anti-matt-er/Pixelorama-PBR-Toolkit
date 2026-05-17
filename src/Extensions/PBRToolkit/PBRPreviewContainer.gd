@@ -10,6 +10,7 @@ const TRANSPARENT_CHECKER_SCENE := preload("res://src/UI/Nodes/TransparentChecke
 const RELOAD_ICON := preload("res://assets/graphics/misc/icon_reload.png")
 const NEW_LAYER_ICON := preload("res://assets/graphics/layers/new.png")
 const NEW_GROUP_ICON := preload("res://assets/graphics/layers/group_new.png")
+const NORMAL_PICKER_SCENE := preload("res://src/Extensions/PBRToolkit/NormalPicker.tscn")
 
 class PBRData:
 	var layer_name: String
@@ -103,13 +104,15 @@ var dragging_preview := false
 var dragging_preview_start_position := Vector2.ZERO
 var accumulated_preview_drag := Vector2.ZERO
 
+signal layer_selected(layer_type)
+
 
 func _ready() -> void:
 	_setup_ui()
 	
 	Global.project_switched.connect(_update_layers)
 	Global.project_data_changed.connect(_on_project_data_changed)
-	Global.cel_switched.connect(_update_all_textures)
+	Global.cel_switched.connect(_on_cel_switched)
 	
 	preview_viewport.gui_input.connect(_preview_viewport_gui_input)
 	preview_zoom_slider.value_changed.connect(zoom_camera_from_slider)
@@ -367,6 +370,31 @@ func _update_all_textures() -> void:
 	_update_texture(emission.option_button.selected, emission)
 	_update_texture(ambient_occlusion.option_button.selected, ambient_occlusion)
 	_update_texture(normal.option_button.selected, normal)
+
+
+func _on_cel_switched() -> void:
+	_update_all_textures()
+	var project = Global.current_project
+	var current_layer: BaseLayer = project.layers[project.current_layer]
+	
+	if not current_layer:
+		layer_selected.emit(null)
+		return
+	
+	var selected := selected_layers[Global.current_project_index]
+	var selected_layer_type = selected.find_key(current_layer)
+	
+	if not selected_layer_type:
+		for layer_type in selected.keys():
+			var layer: BaseLayer = selected[layer_type]
+			if not layer:
+				continue
+			
+			if layer.is_ancestor_of(current_layer):
+				selected_layer_type = layer_type
+				break
+	
+	layer_selected.emit(selected_layer_type)
 
 
 func prepare_layers_for_export(pack_orm: bool) -> void:
